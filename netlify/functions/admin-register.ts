@@ -4,6 +4,7 @@ import { hashPassword } from "./../common/password";
 import { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
 import { AdminRegisterInput } from "../common/sdk";
 import { config } from "../core/config";
+import { verifyHasura } from "../common/verifyHasura";
 
 const handler: Handler = async (
   event: HandlerEvent,
@@ -11,16 +12,12 @@ const handler: Handler = async (
 ) => {
   const { body, headers } = event;
 
-  if (
-    !headers["x-tvoyapolychka-secret-key"] ||
-    headers["x-tvoyapolychka-secret-key"] !== config.hasuraTvoyapolychkaSecret
-  ) {
-    return {
-      statusCode: 403,
-      body: JSON.stringify({
-        message: "'x-tvoyapolychka-secret-key' is missing or value is invalid",
-      }),
-    };
+
+  try{
+    verifyHasura(headers)
+  }
+  catch(error){
+    return JSON.parse(error.message)
   }
   const input: AdminRegisterInput = JSON.parse(body!).input.admin;
 

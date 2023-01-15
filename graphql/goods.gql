@@ -1,0 +1,8 @@
+query GetGoodsItemsGroupByCategoryId($firstCategory: uuid! $secondsCategory: uuid!) {
+ firstGroup: goods(where: {category_id: {_eq: $firstCategory}}) {
+    id
+  }
+   secondGroup: goods(where: {category_id: {_eq: $secondsCategory}}) {
+    id
+  }
+}
