@@ -23,6 +23,8 @@ const handler: Handler = async (
       "x-hasura-admin-secret": config.hasuraAdminSecret,
     }
   );
+ 
+  
 
   if (data.admin.length === 0) {
     return invalidUserOrPassword;

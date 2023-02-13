@@ -11,6 +11,11 @@ query GetAdminById($id: uuid!) {
   }
 }
 
+query GetAdmins {
+  admin {
+    id
+  }
+}
 
 mutation InsertAdmin($password: String!, $username: String!) {
   insert_admin_one(object: {password: $password, username: $username}) {

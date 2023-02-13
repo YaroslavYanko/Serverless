@@ -4,6 +4,8 @@ mutation CreateFakeOrder(
   $client_phone: String!
   $client_surname: String!
   $created_at: timestamptz
+  $comment: String = ""
+  $payment_type: payment_types_enum!
 ) {
   insert_orders_one(
     object: {
@@ -13,6 +15,31 @@ mutation CreateFakeOrder(
       client_surname: $client_surname
       status: NEW
       created_at: $created_at
+      comment: $comment
+      payment_type: $payment_type
+    }
+  ) {
+    id
+  }
+}
+
+mutation CreateOrder(
+  $client_adress: String!
+  $client_name: String!
+  $client_phone: String!
+  $client_surname: String!
+  $comment: String = ""
+  $payment_type: payment_types_enum = CASH
+) {
+  insert_orders_one(
+    object: {
+      client_adress: $client_adress
+      client_name: $client_name
+      client_phone: $client_phone
+      client_surname: $client_surname
+      comment: $comment
+      payment_type: $payment_type
+      status: NEW
     }
   ) {
     id

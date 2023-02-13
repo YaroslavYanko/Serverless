@@ -1,4 +1,7 @@
-import { CreateFakeOrderMutationVariables } from "./../common/sdk";
+import {
+  CreateFakeOrderMutationVariables,
+  Payment_Types_Enum,
+} from "./../common/sdk";
 import { verifyHasura } from "./../common/verifyHasura";
 import { faker } from "@faker-js/faker";
 import { Handler } from "@netlify/functions";
@@ -9,21 +12,26 @@ import { DateTime } from "luxon";
 const handler: Handler = async (event, context) => {
   const { headers, queryStringParameters } = event;
 
-  const { amount: amountRaw = "1", recent: recentRow = "0", forceCreate:forceCreateRaw = 'false' } =
-    queryStringParameters;
+  const {
+    amount: amountRaw = "1",
+    recent: recentRow = "0",
+    forceCreate: forceCreateRaw = "false",
+    phone: phoneRaw = null,
+  } = queryStringParameters;
 
   const amount = Number(amountRaw);
   const recent = Number(recentRow);
-  const forceCreate = forceCreateRaw === 'true'
+  const forceCreate = forceCreateRaw === "true";
+  const phone = phoneRaw ? decodeURIComponent(phoneRaw) : null
 
   try {
     verifyHasura(headers);
   } catch (error) {
     return JSON.parse(error.message);
   }
-   
-  const currentHour = DateTime.now().setZone('Europe/Kiev').hour
-  const isWorkingHours = currentHour>=10 && currentHour <=22
+
+  const currentHour = DateTime.now().setZone("Europe/Kiev").hour;
+  const isWorkingHours = currentHour >= 10 && currentHour <= 22;
 
   // if(!isWorkingHours){
   //   return {
@@ -47,8 +55,12 @@ const handler: Handler = async (event, context) => {
       client_name: faker.name.firstName(),
       client_surname: faker.name.lastName(),
       client_adress: faker.address.streetAddress(true),
-      client_phone: faker.phone.number("+380#########"),
+      client_phone: phone ?? faker.phone.number("+380#########"),
       created_at: new Date(),
+      comment: faker.datatype.boolean() ? faker.lorem.lines() : null,
+      payment_type: faker.datatype.boolean()
+        ? Payment_Types_Enum.Card
+        : Payment_Types_Enum.Cash,
     };
     if (recent !== 0) {
       fakeData.created_at = faker.date.recent(recent);
@@ -66,7 +78,7 @@ const handler: Handler = async (event, context) => {
         faker.datatype.number({ max: secondGroupLength - 1 })
       ].id;
 
-    await api.AddItemsToFakeOrder(
+    await api.AddItemsToOrder(
       {
         objects: [
           {
@@ -78,9 +90,6 @@ const handler: Handler = async (event, context) => {
             products_id: secondGroupItem,
           },
         ],
-      },
-      {
-        "x-hasura-admin-secret": config.hasuraAdminSecret,
       }
     );
   }

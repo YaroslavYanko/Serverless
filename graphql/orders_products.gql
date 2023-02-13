@@ -1,5 +1,13 @@
-mutation AddItemsToFakeOrder($objects: [orders_products_insert_input!]!) {
+mutation AddItemsToOrder($objects: [orders_products_insert_input!]!) {
   insert_orders_products(objects: $objects) {
     affected_rows
   }
 }
+
+# {
+#   "client_adress": "Львів",
+#   "client_name": "Софія",
+#   "client_phone": "+380986388747",
+#   "client_surname": "Фамілія",
+#   "items": "93e941fd-1aa4-4f7f-aaee-97f4bbbfcdf0_2,1fc72435-1f65-4b0d-b7a8-3fb67736b22f_3"
+# }
